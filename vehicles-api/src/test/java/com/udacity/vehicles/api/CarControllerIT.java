@@ -35,6 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -86,6 +87,42 @@ public class CarControllerIT {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isCreated());
+
+        //then
+        resultActions.andExpect(jsonPath("$.id", is(car.getId().intValue())))
+                .andExpect(jsonPath("$.condition", is(car.getCondition().name())))
+                .andExpect(jsonPath("$.details.body", is(car.getDetails().getBody())))
+                .andExpect(jsonPath("$.details.model", is(car.getDetails().getModel())))
+                .andExpect(jsonPath("$.details.manufacturer.code", is(car.getDetails().getManufacturer().getCode())))
+                .andExpect(jsonPath("$.details.manufacturer.name", is(car.getDetails().getManufacturer().getName())))
+                .andExpect(jsonPath("$.details.numberOfDoors", is(car.getDetails().getNumberOfDoors())))
+                .andExpect(jsonPath("$.details.fuelType", is(car.getDetails().getFuelType())))
+                .andExpect(jsonPath("$.details.engine", is(car.getDetails().getEngine())))
+                .andExpect(jsonPath("$.details.mileage", is(car.getDetails().getMileage())))
+                .andExpect(jsonPath("$.details.modelYear", is(car.getDetails().getModelYear())))
+                .andExpect(jsonPath("$.details.productionYear", is(car.getDetails().getProductionYear())))
+                .andExpect(jsonPath("$.details.externalColor", is(car.getDetails().getExternalColor())))
+                .andExpect(jsonPath("$.location.lat", is(car.getLocation().getLat())))
+                .andExpect(jsonPath("$.location.lon", is(car.getLocation().getLon())));
+    }
+    /**
+     * Tests for successful update car in the system
+     *
+     * @throws Exception when car creation fails in the system
+     */
+    @Test
+    public void updateCar() throws Exception {
+        //given
+        Car car = getCar();
+        car.setId(1l);
+
+        //when
+        ResultActions resultActions = mvc.perform(
+                put(new URI("/cars/1"))
+                        .content(json.write(car).getJson())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk());
 
         //then
         resultActions.andExpect(jsonPath("$.id", is(car.getId().intValue())))
